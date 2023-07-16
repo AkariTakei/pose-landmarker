@@ -31,7 +31,7 @@ let itemH = 60; // itemの高さ
 
 
 function preload() {
-  img = loadImage('../images/basket.png');
+  img = loadImage('./../images/basket.png');
 }
 
 function setup() {
