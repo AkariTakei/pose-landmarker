@@ -65,8 +65,7 @@ function enableCam(event) {
     }
     // getUsermedia parameters.
     const constraints = {
-        video: true,
-        facingMode: { exact: "environment" }
+        video: { facingMode: "environment" }, // 外カメラを指定
     };
     // Activate the webcam stream.
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
