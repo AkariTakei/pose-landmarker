@@ -107,9 +107,9 @@ function draw() {
   if (pose_results) {
     for (let landmarks of pose_results.landmarks) {
       for (let landmark of landmarks) {
-        fill(255);
-        noStroke();
-        circle(landmark.x * width, landmark.y * height, 20)
+        // fill(255);
+        // noStroke();
+        // circle(landmark.x * width, landmark.y * height, 20)
 
         if (landmark == landmarks[0]) {
           nose_x = landmark.x * width;
@@ -324,7 +324,7 @@ let enemies = [];
 function enemyDraw() { // 敵の描画
 
 
-  if (currentTime - lastEnemyTime > enemyTime - 3000) { // 3秒前に敵の出現を知らせる
+  if (currentTime - lastEnemyTime > enemyTime - 3000 && enemies.length == 0) { // 3秒前に敵の出現を知らせる
     if (enemyNum == 1) {
       let newEnemy = new Enemy(0, nose_y - 100, enemyNum);
       enemies.push(newEnemy);
@@ -366,11 +366,11 @@ function enemyDraw() { // 敵の描画
     if (currentTime - lastEnemyTime >= 3000) {
       image(hachi, enemies[i].x, enemies[i].y, width / 8, width / 8);
       if (enemies[i].a == 1) {
-        enemies[i].x += width / 280;
+        enemies[i].x += width / 230;
       }
 
       else if (enemies[i].a == 2) {
-        enemies[i].y += height / 320;
+        enemies[i].y += height / 270;
       }
 
       if (enemies[i].x > width || enemies[i].y > height) {
