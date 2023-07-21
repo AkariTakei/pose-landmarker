@@ -317,7 +317,7 @@ function itemDraw() {
 
 
     if (items[i].y <= height) {
-      items[i].y += height / 250;
+      items[i].y += 3;
     }
 
     if (items[i].y > height) {
@@ -434,11 +434,11 @@ function enemyDraw() { // 敵の描画
     if (currentTime - lastEnemyTime >= 3000) {
       image(hachi, -enemies[i].x, enemies[i].y, width / 8, width / 8);
       if (enemies[i].a == 1) {
-        enemies[i].x -= width / 200;
+        enemies[i].x -= 5;
       }
 
       else if (enemies[i].a == 2) {
-        enemies[i].y += height / 270;
+        enemies[i].y += 5;
       }
 
       if (enemies[i].x < 0 || enemies[i].y > height) {
