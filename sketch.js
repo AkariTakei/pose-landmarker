@@ -61,6 +61,11 @@ let itemW = 60; // itemの幅
 let itemH = 60; // itemの高さ
 let itemState = 0; // itemの状態
 
+let enemyX; // 敵の左上x座標
+let enemyY; // 敵の左上y座標
+let enemyW = 60; // 敵の幅
+let enemyH = 60; // 敵の高さ
+
 let enemyTime = 10000; // 敵が出現する時間間隔
 let lastEnemyTime = 0; // 前回敵が出現した時間
 let currentTime = 0; // 現在時刻
@@ -103,9 +108,18 @@ function setup() {
   enemyNum = int(random(1, 3));
 
 
+
 }
 
 function draw() {
+  translate(width, 0);
+
+  // translate(width / 2, height / 2);
+  // // キャンバスを反転させる
+  // scale(-1, 1);
+  // // キャンバスの中心から元の位置に戻す
+  // translate(-width / 2, -height / 2);
+
   currentTime = millis();
   if (gameState === GAME_STATE_GAMEOVER) {
     drawGameOverScreen();
@@ -126,7 +140,7 @@ function draw() {
 
 
     textSize(20);
-    text(score, width / 5 * 4, height / 10); // スコアを表示する
+    text(-score, width / 5 * 4, height / 10); // スコアを表示する
 
     itemDraw();
     enemyDraw();
@@ -134,16 +148,19 @@ function draw() {
     // 各頂点座標を表示する
     // 各頂点座標の位置と番号の対応は以下のURLを確認
     // https://developers.google.com/mediapipe/solutions/vision/pose_landmarker
+
     if (pose_results) {
       for (let landmarks of pose_results.landmarks) {
         for (let landmark of landmarks) {
+
           fill(255);
           noStroke();
-          circle(landmark.x * width, landmark.y * height, 20)
+          // circle(-landmark.x * width, landmark.y * height, 20)
 
           if (landmark == landmarks[0]) {
             nose_x = landmark.x * width;
             nose_y = landmark.y * height;
+            circle(-nose_x, nose_y, 20);
           }
 
           if (landmark == landmarks[11]) {
@@ -166,19 +183,27 @@ function draw() {
           if (landmark == landmarks[15]) {
             left_x = landmark.x * width;
             left_y = landmark.y * height;
+            circle(-left_x, left_y, 20);
             LeftDrawbasket();
           }
 
           if (landmark == landmarks[16]) {
             right_x = landmark.x * width;
             right_y = landmark.y * height;
+            circle(-right_x, right_y, 20);
             // RightDrawbasket();
           }
-        }
 
+        }
       }
     }
+
   }
+
+  translate(-width, 0);
+
+
+
 }
 
 
@@ -199,51 +224,52 @@ function LeftDrawbasket() {
   if (left_elbow > left_y && left_x - right_x < (left_shoulder_x - right_shoulder_x) / 2) {
     if (catchNum < 3) {
       imageMode(CENTER);
-      image(img, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5), img.height / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5), img.height / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 3 && catchNum < 6) {
       imageMode(CENTER);
-      image(img1, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img1, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 6 && catchNum < 9) {
       imageMode(CENTER);
-      image(img2, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img2, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 9 && catchNum < 12) {
       imageMode(CENTER);
-      image(img3, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img3, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 12 && catchNum < 15) {
       imageMode(CENTER);
-      image(img4, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img4, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 15 && catchNum < 18) {
       imageMode(CENTER);
-      image(img5, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img5, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
     if (catchNum >= 18) {
       imageMode(CENTER);
-      image(img6, left_x - (left_x - right_x) / 2, left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
+      image(img6, (-(left_x - (left_x - right_x) / 2)), left_y - 50, img.width / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5), img1.height / (img1.width / (left_shoulder_x - right_shoulder_x) * 0.5));
       imageMode(CORNER);
     }
 
 
     leftBasketW = img.width / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5); // basketの幅
     leftBasketH = img.height / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5); // basketの高さ
-    leftBasketX = left_x - -(left_x - right_x) / 2 - leftBasketW / 2; // basketの左上x座標
+    leftBasketX = - (left_x - (left_x - right_x) / 2 + leftBasketW / 2); // basketの左上x座標
     leftBasketY = left_y - 50 - img.height / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5) + leftBasketH / 2; // basketの左上y座標
+
   }
 
 
@@ -282,11 +308,11 @@ function itemDraw() {
   for (let i = items.length - 1; i >= 0; i--) {
 
     if (items[i].color !== 1) { // 通常のリンゴ
-      image(apple, items[i].x, items[i].y, width / 10, width / 10);
+      image(apple, -items[i].x, items[i].y, width / 10, width / 10);
     }
 
     if (items[i].color == 1) { // 金のリンゴ
-      image(apple_gold, items[i].x, items[i].y, width / 10, width / 10);
+      image(apple_gold, -items[i].x, items[i].y, width / 10, width / 10);
     }
 
 
@@ -300,13 +326,14 @@ function itemDraw() {
 
     if (items[i] !== undefined) {
 
-      itemX = items[i].x; // itemの左上x座標
+      itemX = -items[i].x; // itemの左上x座標
       itemY = items[i].y; // itemの左上y座標
       itemState = items[i].color; // itemの状態
 
       // itemとbasketの当たり判定をチェックする
 
       itemW = width / 10; // itemの幅
+
     }
 
 
@@ -346,6 +373,8 @@ function itemDraw() {
       items.splice(i, 1);
     }
   }
+
+
 }
 
 
@@ -364,7 +393,7 @@ function enemyDraw() { // 敵の描画
 
   if (currentTime - lastEnemyTime > enemyTime - 3000 && enemies.length == 0) { // 3秒前に敵の出現を知らせる
     if (enemyNum == 1) {
-      let newEnemy = new Enemy(0, nose_y - 100, enemyNum);
+      let newEnemy = new Enemy(width + 50, nose_y - 100, enemyNum);
       enemies.push(newEnemy);
       // image(kiken, 0, nose_y - 100, width / 12, width / 12);
     }
@@ -376,7 +405,8 @@ function enemyDraw() { // 敵の描画
     }
 
     lastEnemyTime = currentTime;
-    enemyTime = random(10000, 20000);
+    //enemyTime = random(10000, 20000);
+    enemyTime = random(500, 1000);
     enemyNum = int(random(1, 3));
 
   }
@@ -402,16 +432,16 @@ function enemyDraw() { // 敵の描画
   for (let i = enemies.length - 1; i >= 0; i--) { // 敵の移動と当たり判定
 
     if (currentTime - lastEnemyTime >= 3000) {
-      image(hachi, enemies[i].x, enemies[i].y, width / 8, width / 8);
+      image(hachi, -enemies[i].x, enemies[i].y, width / 8, width / 8);
       if (enemies[i].a == 1) {
-        enemies[i].x += width / 200;
+        enemies[i].x -= width / 200;
       }
 
       else if (enemies[i].a == 2) {
         enemies[i].y += height / 270;
       }
 
-      if (enemies[i].x > width || enemies[i].y > height) {
+      if (enemies[i].x < 0 || enemies[i].y > height) {
         enemies.splice(i, 1);
       }
     }
@@ -420,24 +450,27 @@ function enemyDraw() { // 敵の描画
 
     if (enemies[i] !== undefined) {
       if (enemies[i].a == 1 && currentTime - lastEnemyTime < 3000) {
-        image(kiken, 0, enemies[i].y - width / 24, width / 12, width / 12);
+        image(kiken, -width, enemies[i].y - width / 24, width / 12, width / 12);
       }
 
       if (enemies[i].a == 2 && currentTime - lastEnemyTime < 3000) {
-        image(kiken, enemies[i].x - width / 24, 0, width / 12, width / 12);
+        image(kiken, -enemies[i].x - width / 24, 0, width / 12, width / 12);
       }
 
-      enemyX = enemies[i].x;
+      enemyX = -enemies[i].x;
       enemyY = enemies[i].y;
 
 
       enemyW = width / 8;
       enemyH = width / 8;
+
+
+
     }
 
-    let hit = collideRectCircle(enemyX, enemyY, enemyW, enemyH, nose_x, nose_y - (left_shoulder_x - right_shoulder_x) * 0.1, (left_shoulder_x - right_shoulder_x) * 0.7, (left_shoulder_x - right_shoulder_x) * 0.7);
+    let hit = collideRectCircle(enemyX, enemyY, enemyW, enemyH, -nose_x, nose_y - (left_shoulder_x - right_shoulder_x) * 0.1, (left_shoulder_x - right_shoulder_x) * 0.7, (left_shoulder_x - right_shoulder_x) * 0.7);
     if (hit) {
-      image(syoutotu, nose_x, nose_y - (left_shoulder_x - right_shoulder_x) * 0.1, (left_shoulder_x - right_shoulder_x) * 0.7, (left_shoulder_x - right_shoulder_x) * 0.7);
+      image(syoutotu, -nose_x, nose_y - (left_shoulder_x - right_shoulder_x) * 0.1, (left_shoulder_x - right_shoulder_x) * 0.7, (left_shoulder_x - right_shoulder_x) * 0.7);
       if (catchNum > 0) {
         catchNum = 0;
       }
@@ -450,7 +483,7 @@ function enemyDraw() { // 敵の描画
 function drawTitleScreen() {
   let y = height / 100 * sin(angle); // スタート画面の画像を上下に揺らす
   imageMode(CENTER);
-  image(start, width / 2, height / 6 * 5 + y, start.width * width * 0.001, start.height * width * 0.001);
+  image(start, -width / 2, height / 6 * 5 + y, start.width * width * 0.001, start.height * width * 0.001);
   imageMode(CORNER);
   angle += 0.03;
   console.log("title");
@@ -462,19 +495,19 @@ function drawTitleScreen() {
         // circle(landmark.x * width, landmark.y * height, 20)
 
         if (landmark == landmarks[0]) {
-          nose_x = landmark.x * width;
+          nose_x = -landmark.x * width;
           nose_y = landmark.y * height;
         }
 
 
         if (landmark == landmarks[15]) {
-          left_x = landmark.x * width;
+          left_x = -landmark.x * width;
           left_y = landmark.y * height;
           // LeftDrawbasket();
         }
 
         if (landmark == landmarks[16]) {
-          right_x = landmark.x * width;
+          right_x = -landmark.x * width;
           right_y = landmark.y * height;
           // RightDrawbasket();
         }

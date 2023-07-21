@@ -6,7 +6,7 @@ const externalCamButton = document.getElementById("externalCamButton");
 const video = document.getElementById("webcam");
 const canvasElement = document.getElementById("canvas");
 
-messageElement.innerHTML = "モデルを読み込んでいます...";
+messageElement.innerHTML = "準備...";
 internalCamButton.disabled = true;
 externalCamButton.disabled = true;
 internalCamButton.style.display = "none";
@@ -26,7 +26,7 @@ const createPoseLandmarker = async () => {
         runningMode: runningMode,
         numPoses: 2,
     });
-    messageElement.innerHTML += "完了";
+    messageElement.innerHTML += "完了！";
     internalCamButton.disabled = false;
     externalCamButton.disabled = false;
     internalCamButton.style.display = "inline";
@@ -53,11 +53,11 @@ function enableCam(facingMode) {
     webcamRunning = !webcamRunning;
 
     if (webcamRunning) {
-        internalCamButton.innerText = "予測を無効化";
-        externalCamButton.innerText = "予測を無効化";
+        internalCamButton.innerText = "　";
+        externalCamButton.innerText = "　";
     } else {
-        internalCamButton.innerText = "内部カメラ";
-        externalCamButton.innerText = "外部カメラ";
+        internalCamButton.innerText = "1人で遊ぶ";
+        externalCamButton.innerText = "2人で遊ぶ";
     }
 
     const constraints = {

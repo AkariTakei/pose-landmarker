@@ -5,10 +5,16 @@
   <script defer src="https://unpkg.com/p5.collide2d"></script>
   <meta charset="UTF-8">
   <title>p5MediaPipeHands Pose Landmarker</title>
+
+  <style>
+    #webcam {
+      transform: scaleX(-1);
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Pose Landmarker</h1>
+  <h1>フルーツ拾い</h1>
   <p id="message"></p>
 
   <!-- <button id="webcamButton" disabled>
@@ -17,12 +23,12 @@
 
   <!-- 内部カメラ用のボタン -->
   <button id="internalCamButton" style="display: none;" disabled>
-    内部カメラ
+    1人で遊ぶ
   </button>
 
   <!-- 外部カメラ用のボタン -->
   <button id="externalCamButton" style="display: none;" disabled>
-    外部カメラ
+    2人で遊ぶ
   </button>
 
   <div style="position: relative;">
@@ -32,9 +38,9 @@
 
   <!-- js ライブラリをインクルード -->
   <script src="./p5.js"></script>
-  <script src="./sketch.js"></script>
   <!-- カメラモード切り替えを実装したスクリプトを使う -->
   <script type="module" src="./script.js"></script>
+  <script src="./sketch.js"></script>
 </body>
 
 </html>
