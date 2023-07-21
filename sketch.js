@@ -106,13 +106,22 @@ function setup() {
   }
 
   enemyNum = int(random(1, 3));
+  frameRate(30);
+  translate(0, 0);
 
 
 
 }
 
 function draw() {
+  clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
+  textSize(20);
+  fill(0);
+  text(frameCount, width / 2, height / 2);
+  console.log(frameCount);
+  text(-score, width / 5 * 4, height / 10); // スコアを表示する
   translate(width, 0);
+
 
   // translate(width / 2, height / 2);
   // // キャンバスを反転させる
@@ -126,7 +135,7 @@ function draw() {
   }
 
   // 描画処理
-  clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
+
   if (gameState === GAME_STATE_TITLE) {
     drawTitleScreen();
   }
