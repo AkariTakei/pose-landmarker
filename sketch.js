@@ -1,4 +1,14 @@
+const GAME_STATE_TITLE = 0; // タイトル
+const GAME_STATE_PLAYING = 1; // プレイ中
+const GAME_STATE_GAMEOVER = 2; // ゲームオーバー
+
+let StartTime = 0;
+let timer = 60;
+
+let gameState = GAME_STATE_TITLE; // ゲームの状態
 let pose_results;
+
+let angle = 0; // スタート画面の画像の回転角度
 
 let nose_x = 0;
 let nose_y = 0;
@@ -14,6 +24,8 @@ let left_shoulder_x = 0;
 
 let left_elbow = 0;
 let right_elbow = 0;
+
+let start; // スタート画面の画像
 
 let img; // basketの画像
 let img1; // basket1の画像
@@ -60,6 +72,8 @@ const timeLimit = 60000; // 60秒
 
 
 function preload() {
+  start = loadImage('./images/start.png');
+
   img = loadImage('./images/basket.png');
   img1 = loadImage('./images/basket1.png');
   img2 = loadImage('./images/basket2.png');
@@ -92,63 +106,78 @@ function setup() {
 
 function draw() {
   currentTime = millis();
-  // 描画処理
-  clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
-
-  textSize(20);
-  text(score, width / 5 * 4, height / 10); // スコアを表示する
-
-  itemDraw();
-  enemyDraw();
-
-  // 各頂点座標を表示する
-  // 各頂点座標の位置と番号の対応は以下のURLを確認
-  // https://developers.google.com/mediapipe/solutions/vision/pose_landmarker
-  if (pose_results) {
-    for (let landmarks of pose_results.landmarks) {
-      for (let landmark of landmarks) {
-        // fill(255);
-        // noStroke();
-        // circle(landmark.x * width, landmark.y * height, 20)
-
-        if (landmark == landmarks[0]) {
-          nose_x = landmark.x * width;
-          nose_y = landmark.y * height;
-        }
-
-        if (landmark == landmarks[11]) {
-          left_shoulder_x = landmark.x * width;
-        }
-
-        if (landmark == landmarks[12]) {
-          right_shoulder_x = landmark.x * width;
-        }
-
-        if (landmark == landmarks[13]) {
-          left_elbow = landmark.y * height;
-        }
-
-        if (landmark == landmarks[14]) {
-          right_elbow = landmark.y * height;
-        }
-
-
-        if (landmark == landmarks[15]) {
-          left_x = landmark.x * width;
-          left_y = landmark.y * height;
-          LeftDrawbasket();
-        }
-
-        if (landmark == landmarks[16]) {
-          right_x = landmark.x * width;
-          right_y = landmark.y * height;
-          // RightDrawbasket();
-        }
-      }
-
-    }
+  if (gameState === GAME_STATE_GAMEOVER) {
+    drawGameOverScreen();
   }
 
+  // 描画処理
+  clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
+  if (gameState === GAME_STATE_TITLE) {
+    drawTitleScreen();
+  }
+
+  if (gameState === GAME_STATE_PLAYING) {
+
+    if (startTime + 60000 < currentTime) {
+      gameState = GAME_STATE_GAMEOVER;
+    }
+    console.log(timer - int((currentTime - startTime) / 1000));
+
+
+    textSize(20);
+    text(score, width / 5 * 4, height / 10); // スコアを表示する
+
+    itemDraw();
+    enemyDraw();
+
+    // 各頂点座標を表示する
+    // 各頂点座標の位置と番号の対応は以下のURLを確認
+    // https://developers.google.com/mediapipe/solutions/vision/pose_landmarker
+    if (pose_results) {
+      for (let landmarks of pose_results.landmarks) {
+        for (let landmark of landmarks) {
+          // fill(255);
+          // noStroke();
+          // circle(landmark.x * width, landmark.y * height, 20)
+
+          if (landmark == landmarks[0]) {
+            nose_x = landmark.x * width;
+            nose_y = landmark.y * height;
+          }
+
+          if (landmark == landmarks[11]) {
+            left_shoulder_x = landmark.x * width;
+          }
+
+          if (landmark == landmarks[12]) {
+            right_shoulder_x = landmark.x * width;
+          }
+
+          if (landmark == landmarks[13]) {
+            left_elbow = landmark.y * height;
+          }
+
+          if (landmark == landmarks[14]) {
+            right_elbow = landmark.y * height;
+          }
+
+
+          if (landmark == landmarks[15]) {
+            left_x = landmark.x * width;
+            left_y = landmark.y * height;
+            LeftDrawbasket();
+          }
+
+          if (landmark == landmarks[16]) {
+            right_x = landmark.x * width;
+            right_y = landmark.y * height;
+            // RightDrawbasket();
+          }
+        }
+
+      }
+    }
+  }
 }
 
 
@@ -216,16 +245,7 @@ function LeftDrawbasket() {
     leftBasketY = left_y - 50 - img.height / (img.width / (left_shoulder_x - right_shoulder_x) * 0.5) + leftBasketH / 2; // basketの左上y座標
   }
 
-  if (catchNum > 0 && left_x - right_x >= (left_shoulder_x - right_shoulder_x) / 2) { // お手々が離れたらスコアを加算する
-    if (catchNum < 3) { score += catchNum; }
-    if (catchNum >= 3 && catchNum < 6) { score += catchNum * 3; }
-    if (catchNum >= 6 && catchNum < 9) { score += catchNum * 5; }
-    if (catchNum >= 9 && catchNum < 12) { score += catchNum * 7; }
-    if (catchNum >= 12 && catchNum < 15) { score += catchNum * 9; }
-    if (catchNum >= 15 && catchNum < 18) { score += catchNum * 11; }
-    if (catchNum >= 18) { score += catchNum * 13; }
-    catchNum = 0;
-  }
+
 }
 
 // function RightDrawbasket() {
@@ -300,11 +320,28 @@ function itemDraw() {
     }
     if (hitLeft) {
       if (itemState == 1) {
-        catchNum += 3;
-      }
-      else {
+        if (catchNum < 3) { score += 3; }
+        if (catchNum >= 3 && catchNum < 6) { score += 6; }
+        if (catchNum >= 6 && catchNum < 9) { score += 12; }
+        if (catchNum >= 9 && catchNum < 12) { score += 24; }
+        if (catchNum >= 12 && catchNum < 15) { score += 48; }
+        if (catchNum >= 15 && catchNum < 18) { score += 32 * 3; }
+        if (catchNum >= 18) { score += 64 * 3; }
         catchNum += 1;
       }
+      else {
+        if (catchNum < 3) { score += 1; }
+        if (catchNum >= 3 && catchNum < 6) { score += 2; }
+        if (catchNum >= 6 && catchNum < 9) { score += 4; }
+        if (catchNum >= 9 && catchNum < 12) { score += 8; }
+        if (catchNum >= 12 && catchNum < 15) { score += 16; }
+        if (catchNum >= 15 && catchNum < 18) { score += 32; }
+        if (catchNum >= 18) { score += 64; }
+        catchNum += 1;
+      }
+
+
+
       items.splice(i, 1);
     }
   }
@@ -405,6 +442,50 @@ function enemyDraw() { // 敵の描画
       }
       console.log("Game Over");
     }
+  }
+
+}
+
+function drawTitleScreen() {
+  let y = height / 100 * sin(angle); // スタート画面の画像を上下に揺らす
+  imageMode(CENTER);
+  image(start, width / 2, height / 6 * 5 + y, start.width * width * 0.001, start.height * width * 0.001);
+  imageMode(CORNER);
+  angle += 0.03;
+  console.log("title");
+  if (pose_results != null) {
+    for (let landmarks of pose_results.landmarks) {
+      for (let landmark of landmarks) {
+        // fill(255);
+        // noStroke();
+        // circle(landmark.x * width, landmark.y * height, 20)
+
+        if (landmark == landmarks[0]) {
+          nose_x = landmark.x * width;
+          nose_y = landmark.y * height;
+        }
+
+
+        if (landmark == landmarks[15]) {
+          left_x = landmark.x * width;
+          left_y = landmark.y * height;
+          // LeftDrawbasket();
+        }
+
+        if (landmark == landmarks[16]) {
+          right_x = landmark.x * width;
+          right_y = landmark.y * height;
+          // RightDrawbasket();
+        }
+      }
+
+    }
+  }
+
+  if (left_y < nose_y && right_y < nose_y) {
+    gameState = GAME_STATE_PLAYING;
+    lastEnemyTime = currentTime;
+    startTime = currentTime;
   }
 
 }
