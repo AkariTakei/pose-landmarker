@@ -21,7 +21,7 @@ const createPoseLandmarker = async () => {
     poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: {
             modelAssetPath: `./models/pose_landmarker_lite.task`,
-            delegate: "GPU",
+            delegate: "CPU",
         },
         runningMode: runningMode,
         numPoses: 2,
