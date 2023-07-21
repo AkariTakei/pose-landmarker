@@ -26,6 +26,7 @@ let left_elbow = 0;
 let right_elbow = 0;
 
 let start; // スタート画面の画像
+let Score_Time; // スコア画像
 
 let img; // basketの画像
 let img1; // basket1の画像
@@ -41,7 +42,6 @@ let kiken; // 注意画像
 let hachi; // ハチの画像
 let syoutotu; // ぶつかりエフェクト
 
-let itemNum = 0; // itemの出現確率
 let enemyNum = 0; // 敵の出現確率
 
 let leftBasketX; // basketの左上x座標
@@ -55,6 +55,9 @@ let rightBasketH; // basketの高さ
 
 let hitLeft; // 左のbasketとitemの当たり判定
 
+let itemMaxTime = 3000; // itemが出現する時間間隔
+let itemMinTime = 500; // itemが出現する時間間隔
+let nextItemTime = 0; // 次のitemが出現する時間
 let itemX; // itemの左上x座標
 let itemY; // itemの左上y座標
 let itemW = 60; // itemの幅
@@ -78,6 +81,7 @@ const timeLimit = 60000; // 60秒
 
 function preload() {
   start = loadImage('./images/start.png');
+  Score_Time = loadImage('./images/Score_Time.png');
 
   img = loadImage('./images/basket.png');
   img1 = loadImage('./images/basket1.png');
@@ -115,11 +119,6 @@ function setup() {
 
 function draw() {
   clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
-  textSize(20);
-  fill(0);
-  text(frameCount, width / 2, height / 2);
-  console.log(frameCount);
-  text(-score, width / 5 * 4, height / 10); // スコアを表示する
   translate(width, 0);
 
 
@@ -137,19 +136,27 @@ function draw() {
   // 描画処理
 
   if (gameState === GAME_STATE_TITLE) {
+
     drawTitleScreen();
+
   }
 
   if (gameState === GAME_STATE_PLAYING) {
+
+    image(Score_Time, width / 4 * 3 - width, 0, Score_Time.width * width * 0.0008, Score_Time.height * width * 0.0008);
+    fill(255);
+    textSize(width * 0.038);
+    text(score, width / 9 * 8 - width, height / 12); // スコアを表示する
+    textSize(width * 0.05);
+    fill(107, 68, 21);
+
+    text(timer - int((currentTime - startTime) / 1000), width / 13 * 11.3 - width, height / 4.2); // スコアを表示する
 
     if (startTime + 60000 < currentTime) {
       gameState = GAME_STATE_GAMEOVER;
     }
     console.log(timer - int((currentTime - startTime) / 1000));
 
-
-    textSize(20);
-    text(-score, width / 5 * 4, height / 10); // スコアを表示する
 
     itemDraw();
     enemyDraw();
@@ -308,10 +315,10 @@ class Item {
 let items = [];
 
 function itemDraw() {
-  itemNum = int(random(200));
-  if (itemNum == 1 && items.length < 10) {
+  if (currentTime > nextItemTime) {
     let newItem = new Item(random(width), 0, int(random(10)));
     items.push(newItem);
+    SpawnTime();
   }
 
   for (let i = items.length - 1; i >= 0; i--) {
@@ -326,7 +333,7 @@ function itemDraw() {
 
 
     if (items[i].y <= height) {
-      items[i].y += 3;
+      items[i].y += 5;
     }
 
     if (items[i].y > height) {
@@ -443,11 +450,11 @@ function enemyDraw() { // 敵の描画
     if (currentTime - lastEnemyTime >= 3000) {
       image(hachi, -enemies[i].x, enemies[i].y, width / 8, width / 8);
       if (enemies[i].a == 1) {
-        enemies[i].x -= 5;
+        enemies[i].x -= 8;
       }
 
       else if (enemies[i].a == 2) {
-        enemies[i].y += 5;
+        enemies[i].y += 8;
       }
 
       if (enemies[i].x < 0 || enemies[i].y > height) {
@@ -531,6 +538,10 @@ function drawTitleScreen() {
     startTime = currentTime;
   }
 
+}
+
+function SpawnTime() {
+  nextItemTime = currentTime + int(random(itemMinTime, itemMaxTime));
 }
 
 
