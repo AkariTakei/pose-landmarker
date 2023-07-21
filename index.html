@@ -8,28 +8,33 @@
 </head>
 
 <body>
+  <h1>Pose Landmarker</h1>
+  <p id="message"></p>
 
+  <!-- <button id="webcamButton" disabled>
+    ENABLE PREDICTIONS
+  </button> -->
 
-  <body>
-    <h1>Pose Landmarker</h1>
-    <p id="message"></p>
+  <!-- 内部カメラ用のボタン -->
+  <button id="internalCamButton" style="display: none;" disabled>
+    内部カメラ
+  </button>
 
+  <!-- 外部カメラ用のボタン -->
+  <button id="externalCamButton" style="display: none;" disabled>
+    外部カメラ
+  </button>
 
-    <button id="webcamButton" disabled>
-      ENABLE WEBCAM
-    </button>
-    <div style="position: relative;">
-      <video id="webcam" style="position:absolute;left:0px;top:0px;width:100%;height:auto" autoplay playsinline></video>
-      <div id="canvas" style="position:absolute;left:0px;top:0px">
-      </div>
-    </div>
+  <div style="position: relative;">
+    <video id="webcam" style="position:absolute;left:0px;top:0px;width:100%;height:auto" autoplay playsinline></video>
+    <div id="canvas" style="position:absolute;left:0px;top:0px"></div>
+  </div>
 
-
-    <!-- include js libraries -->
-    <script src="./p5.js"></script>
-    <script src="./sketch.js"></script>
-    <script type="module" src="./script.js"></script>
-
-  </body>
+  <!-- js ライブラリをインクルード -->
+  <script src="./p5.js"></script>
+  <script src="./sketch.js"></script>
+  <!-- カメラモード切り替えを実装したスクリプトを使う -->
+  <script type="module" src="./script.js"></script>
+</body>
 
 </html>
