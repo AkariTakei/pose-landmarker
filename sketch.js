@@ -5,7 +5,7 @@ const GAME_STATE_GAMEOVER = 2; // ゲームオーバー
 let StartTime = 0;
 let timer = 60;
 
-let gameState = GAME_STATE_TITLE; // ゲームの状態
+let gameState; // ゲームの状態
 let pose_results;
 
 let angle = 0; // スタート画面の画像の回転角度
@@ -27,6 +27,7 @@ let right_elbow = 0;
 
 let start; // スタート画面の画像
 let Score_Time; // スコア画像
+let apple_BG; // リンゴの背景画像 
 
 let img; // basketの画像
 let img1; // basket1の画像
@@ -41,6 +42,10 @@ let apple_gold; // itemの画像
 let kiken; // 注意画像
 let hachi; // ハチの画像
 let syoutotu; // ぶつかりエフェクト
+
+let complete1;
+let complete2;
+let complete3;
 
 let enemyNum = 0; // 敵の出現確率
 
@@ -78,10 +83,20 @@ let score = 0;
 let catchNum = 0; // 捕まえた数
 const timeLimit = 60000; // 60秒
 
+//サウンド関係
+let bgm_playing;
+let bgm_title;
+let bgm_gameover;
+let get_item;
+let damage;
+let arart;
+let IsArart = false;
+
 
 function preload() {
   start = loadImage('./images/start.png');
   Score_Time = loadImage('./images/Score_Time.png');
+  apple_BG = loadImage('./images/apple_BG.png');
 
   img = loadImage('./images/basket.png');
   img1 = loadImage('./images/basket1.png');
@@ -97,11 +112,30 @@ function preload() {
   kiken = loadImage('./images/kiken.png');
   hachi = loadImage('./images/hachi.png');
   syoutotu = loadImage('./images/syoutotu.png');
+
+  complete1 = loadImage('./images/complete1.png');
+  complete2 = loadImage('./images/complete2.png');
+  complete3 = loadImage('./images/complete3.png');
+
+  bgm_playing = loadSound('./sound/bgm_play.mp3');
+  bgm_title = loadSound('./sound/title.mp3');
+  bgm_gameover = loadSound('./sound/complete.mp3');
+  get_item = loadSound('./sound/poka03.mp3');
+  damage = loadSound('./sound/damage.mp3');
+  arart = loadSound('./sound/arart.mp3');
 }
 
 function setup() {
+  bgm_playing.setVolume(0.5);
+  bgm_title.setVolume(0.5);
+  bgm_gameover.setVolume(0.5);
+  get_item.setVolume(0.3);
+  arart.setVolume(0.7);
+  damage.setVolume(0.3);
+
   let p5canvas = createCanvas(400, 400);
   p5canvas.parent('#canvas');
+  adjustCanvas();
 
   // お手々が見つかると以下の関数が呼び出される．resultsに検出結果が入っている．
   gotPoses = function (results) {
@@ -113,6 +147,15 @@ function setup() {
   frameRate(30);
   translate(0, 0);
 
+  document.addEventListener('cameraButtonClick', () => {
+    // カメラボタンがクリックされた際の処理をここに記述
+    // 例えば、以下のようにコンソールにメッセージを表示する場合
+    console.log('カメラボタンがクリックされました！');
+    gameState = GAME_STATE_TITLE;
+    bgm_title.play();
+  });
+
+
 
 
 }
@@ -120,6 +163,7 @@ function setup() {
 function draw() {
   clear();  // これを入れないと下レイヤーにあるビデオが見えなくなる
   translate(width, 0);
+
 
 
   // translate(width / 2, height / 2);
@@ -146,14 +190,16 @@ function draw() {
     image(Score_Time, width / 4 * 3 - width, 0, Score_Time.width * width * 0.0008, Score_Time.height * width * 0.0008);
     fill(255);
     textSize(width * 0.038);
-    text(score, width / 9 * 8 - width, height / 12); // スコアを表示する
+    text(score, width / 9 * 8 - width, width / 16); // スコアを表示する
     textSize(width * 0.05);
     fill(107, 68, 21);
 
-    text(timer - int((currentTime - startTime) / 1000), width / 13 * 11.3 - width, height / 4.2); // スコアを表示する
+    text(timer - int((currentTime - startTime) / 1000), width / 13 * 11.3 - width, width / 5.7); // スコアを表示する
 
     if (startTime + 60000 < currentTime) {
       gameState = GAME_STATE_GAMEOVER;
+      bgm_playing.stop();
+      bgm_gameover.play();
     }
     console.log(timer - int((currentTime - startTime) / 1000));
 
@@ -176,7 +222,7 @@ function draw() {
           if (landmark == landmarks[0]) {
             nose_x = landmark.x * width;
             nose_y = landmark.y * height;
-            circle(-nose_x, nose_y, 20);
+            // circle(-nose_x, nose_y, 20);
           }
 
           if (landmark == landmarks[11]) {
@@ -199,14 +245,14 @@ function draw() {
           if (landmark == landmarks[15]) {
             left_x = landmark.x * width;
             left_y = landmark.y * height;
-            circle(-left_x, left_y, 20);
+            // circle(-left_x, left_y, 20);
             LeftDrawbasket();
           }
 
           if (landmark == landmarks[16]) {
             right_x = landmark.x * width;
             right_y = landmark.y * height;
-            circle(-right_x, right_y, 20);
+            // circle(-right_x, right_y, 20);
             // RightDrawbasket();
           }
 
@@ -387,10 +433,11 @@ function itemDraw() {
 
 
       items.splice(i, 1);
+      get_item.play();
     }
   }
 
-
+  console.log(leftBasketX + leftBasketY + leftBasketW + leftBasketH + itemX + itemY + itemW);
 }
 
 
@@ -407,7 +454,7 @@ let enemies = [];
 function enemyDraw() { // 敵の描画
 
 
-  if (currentTime - lastEnemyTime > enemyTime - 3000 && enemies.length == 0) { // 3秒前に敵の出現を知らせる
+  if (currentTime - lastEnemyTime > enemyTime - 3000 && enemies.length == 0) { // 敵の出現
     if (enemyNum == 1) {
       let newEnemy = new Enemy(width + 50, nose_y - 100, enemyNum);
       enemies.push(newEnemy);
@@ -421,33 +468,18 @@ function enemyDraw() { // 敵の描画
     }
 
     lastEnemyTime = currentTime;
-    //enemyTime = random(10000, 20000);
-    enemyTime = random(500, 1000);
+    enemyTime = random(8000, 13000);
     enemyNum = int(random(1, 3));
 
   }
 
-  if (currentTime - lastEnemyTime > enemyTime) { // 敵の出現
-    // if (enemyNum == 1) {
-    //   let newEnemy = new Enemy(0, nose_y - 100, enemyNum);
-    //   enemies.push(newEnemy);
-    // }
-
-    // if (enemyNum == 2) {
-    //   let newEnemy = new Enemy(nose_x, 0 - 50, enemyNum);
-    //   enemies.push(newEnemy);
-    // }
-
-    // lastEnemyTime = currentTime;
-    // enemyTime = random(10000, 20000);
-    // enemyNum = int(random(1, 3));
-  }
 
 
 
   for (let i = enemies.length - 1; i >= 0; i--) { // 敵の移動と当たり判定
 
     if (currentTime - lastEnemyTime >= 3000) {
+      IsArart = false;
       image(hachi, -enemies[i].x, enemies[i].y, width / 8, width / 8);
       if (enemies[i].a == 1) {
         enemies[i].x -= 8;
@@ -465,12 +497,20 @@ function enemyDraw() { // 敵の描画
 
 
     if (enemies[i] !== undefined) {
-      if (enemies[i].a == 1 && currentTime - lastEnemyTime < 3000) {
+      if (enemies[i].a == 1 && currentTime - lastEnemyTime < 3000) { // 注意マークの描画
         image(kiken, -width, enemies[i].y - width / 24, width / 12, width / 12);
+        if (IsArart == false) {
+          arart.play();
+          IsArart = true;
+        }
       }
 
       if (enemies[i].a == 2 && currentTime - lastEnemyTime < 3000) {
         image(kiken, -enemies[i].x - width / 24, 0, width / 12, width / 12);
+        if (IsArart == false) {
+          arart.play();
+          IsArart = true;
+        }
       }
 
       enemyX = -enemies[i].x;
@@ -491,6 +531,8 @@ function enemyDraw() { // 敵の描画
         catchNum = 0;
       }
       console.log("Game Over");
+      enemies.splice(i, 1);
+      damage.play();
     }
   }
 
@@ -533,10 +575,38 @@ function drawTitleScreen() {
   }
 
   if (left_y < nose_y && right_y < nose_y) {
+    if (gameState === GAME_STATE_TITLE) {
+      bgm_playing.play();
+    }
     gameState = GAME_STATE_PLAYING;
+    bgm_title.stop();
     lastEnemyTime = currentTime;
     startTime = currentTime;
   }
+
+}
+
+function drawGameOverScreen() {
+  bgm_playing.stop();
+  fill(255);
+  rect(-width, 0, width, height);
+  image(apple_BG, -width, 0, width, width);
+  imageMode(CENTER);
+  if (score < 100) {
+    image(complete1, width / 2 - width, width * 0.4, complete1.width * width * 0.0015, complete1.height * width * 0.0015);
+  }
+
+  if (score >= 100 && score < 500) {
+    image(complete2, width / 2 - width, width * 0.4);
+  }
+
+  if (score >= 500) {
+    image(complete3, width / 2 - width, width * 0.4);
+  }
+  imageMode(CORNER);
+  textSize(width * 0.04);
+  textAlign(CENTER);
+  text(score, width * 0.5 - width, width * 0.53); // スコアを表示する
 
 }
 

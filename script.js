@@ -1,12 +1,14 @@
 import { PoseLandmarker, FilesetResolver } from "./vision_bundle.js";
 
-const messageElement = document.getElementById("message");
+// const messageElement = document.getElementById("message");
 const internalCamButton = document.getElementById("internalCamButton");
 const externalCamButton = document.getElementById("externalCamButton");
 const video = document.getElementById("webcam");
 const canvasElement = document.getElementById("canvas");
+const cameraButtonClickEvent = new Event('cameraButtonClick');
 
-messageElement.innerHTML = "準備...";
+
+// messageElement.innerHTML = "準備...";
 internalCamButton.disabled = true;
 externalCamButton.disabled = true;
 internalCamButton.style.display = "none";
@@ -26,7 +28,7 @@ const createPoseLandmarker = async () => {
         runningMode: runningMode,
         numPoses: 2,
     });
-    messageElement.innerHTML += "完了！";
+    // messageElement.innerHTML += "完了！";
     internalCamButton.disabled = false;
     externalCamButton.disabled = false;
     internalCamButton.style.display = "inline";
@@ -41,8 +43,15 @@ if (!hasGetUserMedia()) {
     console.warn("このブラウザではgetUserMedia()はサポートされていません");
 }
 
-internalCamButton.addEventListener("click", () => enableCam("user"));
-externalCamButton.addEventListener("click", () => enableCam("environment"));
+internalCamButton.addEventListener("click", () => {
+    enableCam("user");
+    document.dispatchEvent(cameraButtonClickEvent);
+});
+
+externalCamButton.addEventListener("click", () => {
+    enableCam("environment");
+    document.dispatchEvent(cameraButtonClickEvent);
+});
 
 function enableCam(facingMode) {
     if (!poseLandmarker) {
