@@ -1,6 +1,7 @@
 import { PoseLandmarker, FilesetResolver } from "./vision_bundle.js";
 
 // const messageElement = document.getElementById("message");
+const playImage = document.querySelector("img");
 const internalCamButton = document.getElementById("internalCamButton");
 const externalCamButton = document.getElementById("externalCamButton");
 const video = document.getElementById("webcam");
@@ -44,14 +45,20 @@ if (!hasGetUserMedia()) {
 }
 
 internalCamButton.addEventListener("click", () => {
+    hidePlayImage();
     enableCam("user");
     document.dispatchEvent(cameraButtonClickEvent);
 });
 
 externalCamButton.addEventListener("click", () => {
+    hidePlayImage();
     enableCam("environment");
     document.dispatchEvent(cameraButtonClickEvent);
 });
+
+function hidePlayImage() {
+    playImage.style.display = "none";
+}
 
 function enableCam(facingMode) {
     if (!poseLandmarker) {
