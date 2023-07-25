@@ -597,11 +597,11 @@ function drawGameOverScreen() {
   }
 
   if (score >= 100 && score < 500) {
-    image(complete2, width / 2 - width, width * 0.4);
+    image(complete2, width / 2 - width, width * 0.4, complete1.width * width * 0.0015, complete1.height * width * 0.0015);
   }
 
   if (score >= 500) {
-    image(complete3, width / 2 - width, width * 0.4);
+    image(complete3, width / 2 - width, width * 0.4, complete1.width * width * 0.0015, complete1.height * width * 0.0015);
   }
   imageMode(CORNER);
   textSize(width * 0.04);
